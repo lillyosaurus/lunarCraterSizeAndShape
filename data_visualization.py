@@ -12,14 +12,12 @@ asteroidDataRaw=pd.read_csv('AstroStats_Robbins_Moon.csv', sep=',')
 ellipseArea = np.pi * asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] * asteroidDataRaw["DIAM_ELLI_MINOR_IMG"]
 
 
-## Create a series
-circle_cutoff_ecc = 0.4 # Eccentricity less than this number is a circle
+# Calculate cutoffs for a crater to be defined as a "circular crater"
 circle_cutoff_ellip = 1.16 # Ellipticity less than this number is a circle
 
 # Define circle craters by ellipticity
-circle_craters_ellip = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ECCEN_IMG"] < circle_cutoff_ellip]
-# Define circle craters by eccentricity
-circle_craters_ecc = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ECCEN_IMG"] < circle_cutoff_ecc]
+circle_craters_ellip = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] < circle_cutoff_ellip]
+
 
 def plot_size_ellip():
     # Goal: Graph of Crater area (assuming an ellipse fit) vs.
@@ -43,9 +41,8 @@ def plot_size_eccent():
 
 def plot_circle_size_freq():
     # Goal: Graph of size-frequency of all circular craters
-    # (defined having an eccentricity as below circle_cutoff_ecc)
-
-    circleArea = np.pi * (circle_craters_ecc["DIAM_CIRC_IMG"] / 2) ** 2
+    # (defined having an ellipticity below circle_cutoff_ellip)
+    circleArea = np.pi * (circle_craters_ellip["DIAM_CIRC_IMG"] / 2) ** 2
     plt.figure()
     ax = sns.histplot(circleArea, bins=50, log_scale=True, linewidth=0.5, stat='density', color='#994F00')
     sns.kdeplot(circleArea, log_scale=True, ax=ax, color='#006CD1', linewidth=3)
@@ -54,23 +51,24 @@ def plot_circle_size_freq():
     plt.title("Size-Frequency of Circular Lunar Craters")
 
     # Alternative version of above in case we don't want to use seaborn
-    # plt.hist(circleArea, bins=1000)
+    # plt.hist(circleArea, bins=50)
     # plt.xscale("log")
 
-    # Code left just for reference that eccentricity and ellipticity cutoffs are the same graph
-    # circleArea_alt = np.pi * (circle_craters_ellip["DIAM_CIRC_IMG"] / 2) ** 2
+    ## Code left just for reference that eccentricity and ellipticity
+    ## cutoffs look to be the same graph
+    # circle_craters_ecc = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ECCEN_IMG"] < circle_cutoff_ecc]
+    # circleArea_alt = np.pi * (circle_craters_ecc["DIAM_CIRC_IMG"] / 2) ** 2
     # plt.figure()
     # ax2 = sns.histplot(circleArea_alt, bins=50, log_scale=True, linewidth=0.5, stat='density')
     # sns.kdeplot(circleArea_alt, log_scale=True, ax=ax2, color='r')
-    # plt.xlabel("Area of the circular craters from an ellipse fit (km)")
+    # plt.xlabel("Area of the circular craters from an circular fit (km)")
     # plt.ylabel("Frequency")
-    # plt.title("Size-Frequency of  Circular Lunar Craters (Ellipticity Cutoff)")
-
+    # plt.title("Size-Frequency of  Circular Lunar Craters (Eccentricity Cutoff)")
 
 
 # Calling plotting functions
 plot_size_ellip()
-plot_size_eccent()
+# plot_size_eccent()
 plot_circle_size_freq()
 
 plt.show()
