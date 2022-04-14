@@ -7,13 +7,17 @@ import seaborn as sns
 # Import data
 asteroidDataRaw=pd.read_csv('AstroStats_Robbins_Moon.csv', sep=',')
 
+# TODO: Add data cleaning by checking for values of diameter and ellipticity > 0
+
 # Define area of crater series using diameter of the major
 # axis of the crater from an ellipse fit
 ellipseArea = np.pi * asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] * asteroidDataRaw["DIAM_ELLI_MINOR_IMG"]
 
 # Calculate cutoffs for a crater to be defined as a "circular crater"
 circle_cutoff_ellip = 1.16 # Ellipticity less than this number is a circle
-small_cutoff_diam = 100 #All craters' diameters less than or equal to this number are "small"
+
+# All craters' diameters less than or equal to this number are "small"
+small_cutoff_diam = 100
 
 # Define circle craters by ellipticity
 circle_craters_ellip = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] < circle_cutoff_ellip]
@@ -26,27 +30,30 @@ large_craters = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] > small_c
 def plot_size_ellip():
     # Graph of crater diameter (major ellipse diameter) vs. ellipticity
     plt.figure()
-    plt.plot(asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"], asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.5)
+    plt.plot(asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"], asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.3)
+    plt.axhline(y=circle_cutoff_ellip, color='r', linestyle='--')
+    plt.axvline(x=small_cutoff_diam, color='k', linestyle='-.')
     plt.xscale("log")
-    plt.xlabel("Diameter of the crater from an ellipse fit (km)")
-    plt.ylabel("Ellipticity (unitless)")
-    plt.title("Diameter vs Ellipticity of Lunar Craters")
+    plt.xlabel("Lunar Crater Major Axis Diameter (km)")
+    plt.ylabel("Lunar Crater Ellipticity (unitless)")
+    plt.title("Relationship Between Lunar Crater Ellipticity and Major Axis Diameter")
+    plt.legend(["Lunar Craters", "Elliptical Cutoff", "Large Crater Cutoff"])
 
     # Same graph, only small craters
-    plt.figure()
-    plt.plot(small_craters["DIAM_ELLI_MAJOR_IMG"], small_craters["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.5)
-    plt.xscale("log")
-    plt.xlabel("Diameter of the crater from an ellipse fit (km)")
-    plt.ylabel("Ellipticity (unitless)")
-    plt.title("Diameter vs Ellipticity of Lunar Craters")
-
-    # Same graph, only large craters
-    plt.figure()
-    plt.plot(large_craters["DIAM_ELLI_MAJOR_IMG"], large_craters["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.5)
-    plt.xscale("log")
-    plt.xlabel("Diameter of the crater from an ellipse fit (km)")
-    plt.ylabel("Ellipticity (unitless)")
-    plt.title("Diameter vs Ellipticity of Lunar Craters")
+    # plt.figure()
+    # plt.plot(small_craters["DIAM_ELLI_MAJOR_IMG"], small_craters["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.5)
+    # plt.xscale("log")
+    # plt.xlabel("Diameter of the crater from an ellipse fit (km)")
+    # plt.ylabel("Ellipticity (unitless)")
+    # plt.title("Diameter vs Ellipticity of Lunar Craters")
+    #
+    # # Same graph, only large craters
+    # plt.figure()
+    # plt.plot(large_craters["DIAM_ELLI_MAJOR_IMG"], large_craters["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.5)
+    # plt.xscale("log")
+    # plt.xlabel("Diameter of the crater from an ellipse fit (km)")
+    # plt.ylabel("Ellipticity (unitless)")
+    # plt.title("Diameter vs Ellipticity of Lunar Craters")
 
 def plot_size_eccent():
     # Goal: Graph of Crater area (assuming an ellipse fit) vs.
@@ -102,7 +109,7 @@ def plot_large_ellip_freq():
 plot_size_ellip()
 # plot_size_eccent()
 # plot_circle_size_freq()
-plot_small_ellip_freq()
-plot_large_ellip_freq()
+# plot_small_ellip_freq()
+# plot_large_ellip_freq()
 
 plt.show()
