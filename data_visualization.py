@@ -7,7 +7,8 @@ import seaborn as sns
 # Import data
 asteroidDataRaw=pd.read_csv('AstroStats_Robbins_Moon.csv', sep=',')
 
-# TODO: Add data cleaning by checking for values of diameter and ellipticity > 0
+# Clean data by only using craters whose diameter and ellipticity are both 0
+asteroidData = asteroidDataRaw[(asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] > 0) & (asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] > 0)]
 
 # All crater ellipticity over this number are define as an "elliptical crater"
 elliptic_cutoff_ellip = 1.16
@@ -16,23 +17,22 @@ elliptic_cutoff_ellip = 1.16
 large_crater_cutoff = 100
 
 # Define dataframes of craters by shape
-circle_craters = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] < elliptic_cutoff_ellip]
-ellipse_craters = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] > elliptic_cutoff_ellip]
-
+circle_craters = asteroidData[asteroidData["DIAM_ELLI_ELLIP_IMG"] < elliptic_cutoff_ellip]
+ellipse_craters = asteroidData[asteroidData["DIAM_ELLI_ELLIP_IMG"] > elliptic_cutoff_ellip]
 
 # Define dataframes of craters by size
-small_craters = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] <= large_crater_cutoff]
-large_craters = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] > large_crater_cutoff]
+small_craters = asteroidData[asteroidData["DIAM_ELLI_MAJOR_IMG"] <= large_crater_cutoff]
+large_craters = asteroidData[asteroidData["DIAM_ELLI_MAJOR_IMG"] > large_crater_cutoff]
 
 # Define area of crater series using the crater's major axis diameter
 # from an ellipse fit (later unused as we use only diameter instead of area)
-ellipseArea = np.pi * asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] * asteroidDataRaw["DIAM_ELLI_MINOR_IMG"]
+ellipseArea = np.pi * asteroidData["DIAM_ELLI_MAJOR_IMG"] * asteroidData["DIAM_ELLI_MINOR_IMG"]
 
 
 def plot_size_ellip():
     # Graph of crater diameter (major ellipse diameter) vs. ellipticity
     plt.figure()
-    plt.plot(asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"], asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.3)
+    plt.plot(asteroidData["DIAM_ELLI_MAJOR_IMG"], asteroidData["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=0.3)
     plt.axhline(y=elliptic_cutoff_ellip, color='r', linestyle='--')
     plt.axvline(x=large_crater_cutoff, color='k', linestyle='-.')
     plt.xscale("log")
@@ -66,7 +66,7 @@ def plot_large_size_ellip():
 def plot_area_eccent():
     # Graph of crater area (assuming an ellipse fit) vs. Eccentricity
     plt.figure()
-    plt.plot(ellipseArea, asteroidDataRaw["DIAM_ELLI_ECCEN_IMG"], 'o', markersize=0.5)
+    plt.plot(ellipseArea, asteroidData["DIAM_ELLI_ECCEN_IMG"], 'o', markersize=0.5)
     plt.xscale("log")
     plt.xlabel("Area of the crater from an ellipse fit (km)")
     plt.ylabel("Eccentricity (unitless)")
@@ -91,7 +91,7 @@ def plot_circle_size_freq():
 
     ## Code left just for reference that eccentricity and ellipticity
     ## cutoffs look to be the same graph
-    # circle_craters_ecc = asteroidDataRaw[asteroidDataRaw["DIAM_ELLI_ECCEN_IMG"] < circle_cutoff_ecc]
+    # circle_craters_ecc = asteroidData[asteroidData["DIAM_ELLI_ECCEN_IMG"] < circle_cutoff_ecc]
     # circleArea_alt = np.pi * (circle_craters_ecc["DIAM_CIRC_IMG"] / 2) ** 2
     # plt.figure()
     # ax2 = sns.histplot(circleArea_alt, bins=50, log_scale=True, linewidth=0.5, stat='density')
@@ -117,13 +117,13 @@ def plot_large_ellip_freq():
     plt.title("Ellipticity Frequency of Large Lunar Craters")
 
 # Calling plotting functions
-plot_size_ellip()
+# plot_size_ellip()
 # plot_small_size_ellip()
 # plot_large_size_ellip()
 
 # plot_area_eccent()
 
-plot_circle_size_freq()
+# plot_circle_size_freq()
 
 # plot_small_ellip_freq()
 # plot_large_ellip_freq()
