@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-#--------------------------Data Imports and cleaning---------------------------
+#--------------------------Data Imports and Cleaning----------------------------
 # Import data
 asteroidDataRaw=pd.read_csv('AstroStats_Robbins_Moon.csv', sep=',')
 
@@ -13,15 +13,14 @@ asteroidData = asteroidDataRaw[(asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] >= 0) & \
     (asteroidDataRaw["DIAM_ELLI_MAJOR_IMG"] > 0)]
 #use drop na to remove remaining invalid values
 asteroidData = asteroidDataRaw.dropna(0, subset=["DIAM_ELLI_ELLIP_IMG", "DIAM_ELLI_MAJOR_IMG"])
-print(asteroidData)
 
-#--------------------------Define Cutoff Values---------------------------
+#------------------------ Define Cut Off Values --------------------------------
 # Crater ellipticity greater than this number are "elliptical" craters
 ELLIPTIC_CUTOFF_ELLIP = 1.16
 # Crater diameters (km) greater than this number are "large" craters
 LARGE_CRATER_CUTOFF = 100
 
-#--------------------------Functions kept to show process---------------------------
+#------------------------ Functions kept to show process -----------------------
 def plot_circle_size_freq(df, bins):
     # Graph of size-frequency of all circular craters (defined having an
     # ellipticity below ELLIPTIC_CUTOFF_ELLIP)
@@ -78,7 +77,7 @@ def random_asteroid_sample(frac_samples):
     randomAsteroidData = asteroidData.sample(frac=frac_samples, axis='index')
     return randomAsteroidData
 
-#--------------------------Functions used in current analysis---------------------------
+#------------------------ Functions used in current analysis -------------------
 def define_subset_dataframes(df):
     # Define dataframes of craters by shape
     circleCraters = df[df["DIAM_ELLI_ELLIP_IMG"] <= ELLIPTIC_CUTOFF_ELLIP]
@@ -89,37 +88,38 @@ def define_subset_dataframes(df):
     largeCraters = df[df["DIAM_ELLI_MAJOR_IMG"] > LARGE_CRATER_CUTOFF]
     return [circleCraters, ellipseCraters, smallCraters, largeCraters]
 
-def plot_size_ellip(df, markersize):
+def calc_mean_std(df, col):
+    avg = np.mean(df[col])
+    stddev = np.std(df[col])
+    return [avg, stddev]
+
+def plot_size_ellip(df, markersize, alpha):
     # Graph of crater diameter (major ellipse diameter) vs. ellipticity
     plt.figure()
-    plt.plot(df["DIAM_ELLI_MAJOR_IMG"], df["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=markersize, alpha=0.1)
+    plt.plot(df["DIAM_ELLI_MAJOR_IMG"], df["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=markersize, alpha=alpha)
     plt.axhline(y=ELLIPTIC_CUTOFF_ELLIP, color='r', linestyle='--')
     plt.axvline(x=LARGE_CRATER_CUTOFF, color='k', linestyle='-.')
+
     plt.xscale("log")
     plt.xlabel("Lunar Crater Major Axis Diameter (km)")
     plt.ylabel("Lunar Crater Ellipticity (unitless)")
     plt.title("Relationship Between Lunar Crater Ellipticity and Major Axis Diameter")
     plt.legend(["Lunar Craters", "Elliptical Cutoff", "Large Crater Cutoff"])
 
-def plot_prop_ellip(df, binwidth):
-    # Plot dicratized diameter bins, for each bin, get mean and std dev of the ellipticity
-    diamBins = bins=np.arange(min(df["DIAM_ELLI_MAJOR_IMG"]), max(df["DIAM_ELLI_MAJOR_IMG"]) + binwidth, binwidth)
-    print("Bin Values", diamBins)
-    xVals =[]
-    yVals = []
-    yStdDevs = []
-    for index in range(1, len(diamBins)):
-        # Greater than smaller than the larger value of the bin, less than the higer value of the bin
-        diamsInBin = df[(df["DIAM_ELLI_MAJOR_IMG"] >= diamBins[index-1]) & (df["DIAM_ELLI_MAJOR_IMG"] < diamBins[index])]
-        # print("Diams in Bins", diamsInBin)
-        xVals.append((diamBins[index] + diamBins[index-1]) / 2)
-        yVals.append(np.mean(diamsInBin["DIAM_ELLI_ELLIP_IMG"]))
-        yStdDevs.append(np.std(diamsInBin["DIAM_ELLI_ELLIP_IMG"]))
+def plot_small_large_error(numStdDevs=1):
+    smallDiamStats = calc_mean_std(smallCraters, "DIAM_ELLI_MAJOR_IMG")
+    smallEllipStats = calc_mean_std(smallCraters, "DIAM_ELLI_ELLIP_IMG")
+    largeDiamStats = calc_mean_std(largeCraters, "DIAM_ELLI_MAJOR_IMG")
+    largeEllipStats = calc_mean_std(largeCraters, "DIAM_ELLI_ELLIP_IMG")
 
-    print("X Values: ", xVals, "\nY Values: ", yVals, "\nY Standard Deviations: ", yStdDevs)
-    # plt.bar(xVals, yVals)
-    
-#--------------------------Past annalysis---------------------------
+    plt.errorbar(smallDiamStats[0], smallEllipStats[0], yerr=(numStdDevs*smallEllipStats[1]), \
+        fmt='o',ecolor = 'aqua',color='yellow', zorder=3, capsize=5)
+
+    plt.errorbar(largeDiamStats[0], largeEllipStats[0], yerr=numStdDevs*smallEllipStats[1], \
+        fmt='o',ecolor = 'black',color='aqua', zorder=3, capsize=5)
+
+
+#-----------------------------    Past analysis    -----------------------------
 
 ## Calling plotting functions
 # plot_circle_size_freq(df=circleCraters, bins=50)
@@ -127,17 +127,17 @@ def plot_prop_ellip(df, binwidth):
 # plot_small_ellip_freq(df=smallCraters, bins=50)
 # plot_large_ellip_freq(df=largeCraters, bins=50)
 
-# plot_size_ellip(df=randomAsteroidData, markersize=4)
 # plot_small_size_ellip(df=smallCraters, markersize=0.5)
 # plot_large_size_ellip(df=largeCraters, markersize=0.5)
 
 #--------------------------Current annalysis---------------------------
-    
+
 # Call dataframe functions (random sampling and subset dataframes)
 randomAsteroidData = random_asteroid_sample(frac_samples=0.1)
-[circleCraters, ellipseCraters, smallCraters, largeCraters] = define_subset_dataframes(df=randomAsteroidData)
+[circleCraters, ellipseCraters, smallCraters, largeCraters] = define_subset_dataframes(df=asteroidData)
 
-#call plotting function
-plot_prop_ellip(asteroidData, 2)
+# Call plotting functions
+plot_size_ellip(df=asteroidData, markersize=4, alpha=0.5)
+plot_small_large_error(3)
 
 plt.show()
