@@ -96,9 +96,9 @@ def calc_mean_std(df, col):
 def plot_size_ellip(df, markersize, alpha):
     # Graph of crater diameter (major ellipse diameter) vs. ellipticity
     plt.figure()
-    plt.plot(df["DIAM_ELLI_MAJOR_IMG"], df["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=markersize, alpha=alpha)
-    plt.axhline(y=ELLIPTIC_CUTOFF_ELLIP, color='r', linestyle='--')
-    plt.axvline(x=LARGE_CRATER_CUTOFF, color='k', linestyle='-.')
+    plt.plot(df["DIAM_ELLI_MAJOR_IMG"], df["DIAM_ELLI_ELLIP_IMG"], 'o', markersize=markersize, alpha=1)
+    plt.axhline(y=ELLIPTIC_CUTOFF_ELLIP, color="r", linestyle='-', linewidth=2)
+    plt.axvline(x=LARGE_CRATER_CUTOFF, color='k', linestyle='-.', linewidth=2)
 
     plt.xscale("log")
     plt.xlabel("Lunar Crater Major Axis Diameter (km)")
@@ -113,10 +113,13 @@ def plot_small_large_error(numStdDevs=1):
     largeEllipStats = calc_mean_std(largeCraters, "DIAM_ELLI_ELLIP_IMG")
 
     plt.errorbar(smallDiamStats[0], smallEllipStats[0], yerr=(numStdDevs*smallEllipStats[1]), \
-        fmt='o',ecolor = 'aqua',color='yellow', zorder=3, capsize=5)
+        fmt='o',ecolor = 'black',color='yellow', zorder=3, capsize=9, elinewidth=2, capthick=2)
 
     plt.errorbar(largeDiamStats[0], largeEllipStats[0], yerr=numStdDevs*smallEllipStats[1], \
-        fmt='o',ecolor = 'black',color='aqua', zorder=3, capsize=5)
+        fmt='s',ecolor = 'black',color='black', zorder=3, capsize=9, elinewidth=2, capthick=2)
+
+    plt.legend(["Lunar Craters", "Elliptical Cutoff", "Large Crater Cutoff", "Small Crater Avg. Ellipticity", "Large Crater Avg. Ellipticity"], bbox_to_anchor=(1.04,1), borderaxespad=0)
+
 
 
 #-----------------------------    Past analysis    -----------------------------
@@ -130,7 +133,7 @@ def plot_small_large_error(numStdDevs=1):
 # plot_small_size_ellip(df=smallCraters, markersize=0.5)
 # plot_large_size_ellip(df=largeCraters, markersize=0.5)
 
-#--------------------------Current annalysis---------------------------
+#--------------------------      Current analysis    ---------------------------
 
 # Call dataframe functions (random sampling and subset dataframes)
 randomAsteroidData = random_asteroid_sample(frac_samples=0.1)
