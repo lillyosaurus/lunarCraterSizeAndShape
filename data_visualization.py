@@ -6,7 +6,8 @@ import seaborn as sns
 
 #------------------------- Data Imports and Cleaning ---------------------------
 # Import data
-asteroidDataRaw=pd.read_csv('AstroStats_Robbins_Moon.csv', sep=',')
+csvLink = "https://raw.githubusercontent.com/lillyosaurus/lunarCraterSizeAndShape/main/AstroStats_Robbins_Moon.csv"
+asteroidDataRaw=pd.read_csv(csvLink, sep=',')
 
 # Clean data by only using craters whose ellipticity and diameter are both > 0
 asteroidData = asteroidDataRaw[(asteroidDataRaw["DIAM_ELLI_ELLIP_IMG"] >= 0) & \
