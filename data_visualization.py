@@ -22,8 +22,7 @@ LARGE_CRATER_CUTOFF = 100
 
 #------------------------ Functions kept to show process -----------------------
 def plot_circle_size_freq(df, bins):
-    # Graph of size-frequency of all circular craters (defined having an
-    # ellipticity below ELLIPTIC_CUTOFF_ELLIP)
+    # Graph of size-frequency of all circular craters (defined having an ellipticity below ELLIPTIC_CUTOFF_ELLIP)
     plt.figure()
     sns.histplot(df["DIAM_CIRC_IMG"], bins=bins, log_scale=True, linewidth=0.5, stat='density', color='#994F00')
     plt.xlabel("Diameter of the circular craters from an circular fit (km)")
@@ -136,8 +135,8 @@ def plot_small_large_error(numStdDevs=1):
 
 
 #-----------------------------    Past analysis    -----------------------------
-# Note, these have been moved about the "define_subset_dataframes" function call
-# for code readibility, and will run if moved underneath the function call below!
+# Note, these have been moved about the "define_subset_dataframes" function call for code readibility,
+# and will run if moved underneath the function call below!
 
 ## Calling plotting functions
 # plot_circle_size_freq(df=circleCraters, bins=50)
